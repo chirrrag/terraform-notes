@@ -1,0 +1,29 @@
+# cross referencing
+terraform {
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+      version = "4.23.0"
+    }
+  }
+}
+
+provider "aws" {
+  # Configuration options
+  region = var.region
+  access_key = var.access_key
+  secret_key = var.secret_key
+
+}
+
+variable "elb_names" {
+  type = list
+  default = ["dev-loadbalancer", "stage-loadbalancer", "run-loadbalancer", "prod-loadbalancer", "test-loadbalancer"]
+}
+resource "aws_iam_user" "IAM" {
+#   name = "loadbalancer"
+#   name = "loadbalancer.${count.index}"
+  name = var.elb_names[count.index]
+  count = 5
+  path = "/system/"
+}

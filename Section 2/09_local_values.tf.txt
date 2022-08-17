@@ -1,0 +1,30 @@
+terraform {
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+      version = "4.23.0"
+    }
+  }
+}
+
+provider "aws" {
+  # Configuration options
+  region = var.region
+  access_key = var.access_key
+  secret_key = var.secret_key
+
+}
+
+locals {
+  Common_tags = {
+    Owner = "Devop Team"
+    Service = "backend"
+  }
+}
+
+resource "aws_instance" "dev" {
+  ami          = "ami-098e42ae54c764c35"
+  instance_type = "t2.micro"
+
+  tags = local.Common_tags
+}

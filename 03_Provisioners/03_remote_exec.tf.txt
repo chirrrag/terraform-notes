@@ -1,0 +1,22 @@
+resource "aws_instance" "myec2" {
+  ami = "ami-098e42ae54c764c35"
+  instance_type = "t2.micro"
+  key_name = "terraform-key.pem"
+
+    connection {
+    type     = "ssh"
+    user     = "ec2-user" # user for amzn linux will be ec2, not the root
+    # password = var.root_password commented because we will not use password
+    private_key = file("./terraform-key.pem")
+    host     = self.public_ip # it will pickup the public ip aftaer instance creation
+
+    }
+
+    provisioner "remote-exec" {
+          inline = [
+            "sudo amazon-linux-extras install -y nginx1",
+     "sudo systemctl start nginx"
+          ]
+    }
+
+}

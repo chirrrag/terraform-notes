@@ -1,0 +1,49 @@
+# cross referencing
+terraform {
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+      version = "4.23.0"
+    }
+  }
+}
+
+provider "aws" {
+  # Configuration options
+  region = var.region
+  access_key = var.access_key
+  secret_key = var.secret_key
+
+}
+
+resource "aws_instance" "my-ec2" {
+  ami           = "ami-098e42ae54c764c35"
+  instance_type = var.instance_type
+
+  tags = {
+    Name = "help"
+  }
+}
+resource "aws_eip" "lb" {
+  vpc = true
+}
+# giving Elastic ip to the instance
+resource "aws_eip_association" "eip_assoc" {
+  instance_id   = aws_instance.my-ec2.id
+  allocation_id = aws_eip.lb.id
+}
+
+# now adding the security group
+# giving elastic ip to secut=rity group
+
+resource "aws_security_group" "allow_tls" {
+  name        = "custom-security-group"
+  
+  ingress {
+    # description      = "TLS from VPC"
+    from_port        = 443
+    to_port          = 443
+    protocol         = "tcp"
+    cidr_blocks      = ["${aws_eip.lb.public_ip}/32"]
+  }
+}
